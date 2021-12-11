@@ -119,7 +119,8 @@ function generateQueries(tables){
         let table = tables[key]
         const table_name = table.name
         file_content += `const ${table_name} = {\n`
-        file_content += getTableListingQuery(table_name, queryFunctionNames)
+        file_content += getTableListingQuery(table_name)
+        file_content += getTableElementQuery(table_name)
         file_content += '}\n'
         queryFunctionNames.push(table_name)
     }
@@ -131,10 +132,8 @@ function generateQueries(tables){
     generateQueriesFile(exports, file_content, "src/backend/queries.js")
 }
 
-function getTableListingQuery(table_name, queryFunctionNames){
-
-    // const upper_case_table_name = table_name.charAt(0).toUpperCase() + table_name.slice(1)
-    // queryFunctionNames.push(`get${upper_case_table_name}`) const get${upper_case_table_name}
+function getTableListingQuery(table_name){
+    
     return `list: (request, response) => {
     pool.query('SELECT * FROM ${table_name} ORDER BY id ASC', (error, results) => {
         if (error) {
@@ -147,7 +146,16 @@ function getTableListingQuery(table_name, queryFunctionNames){
 }
 
 function getTableElementQuery(table_name) {
+    return `get: (request, response) => {
+    const id = parseInt(request.params.id)
 
+    pool.query('SELECT * FROM ${table_name} WHERE id = $1', [id], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
+},\n`
 }
 
 function createTableElementQuery(table_name) {

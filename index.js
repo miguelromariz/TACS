@@ -53,7 +53,7 @@ for (let table_name in db){
     const methods = db[table_name]
     const base_dir = `/${table_name}`
     app.get(base_dir, methods["list"])
-    // app.get(`${base_dir}:id`, methods["get"])
+    app.get(`${base_dir}/:id`, methods["get"])
     // app.post(base_dir, methods["post"])
     // app.put(`${base_dir}/:id`, methods["put"])
     // app.delete(`${base_dir}/:id`, methods["delete"])
