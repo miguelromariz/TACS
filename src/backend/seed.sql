@@ -1,7 +1,7 @@
 --drop
 DROP TABLE IF EXISTS Patient;
 DROP TABLE IF EXISTS Doctor;
---drop
+--tables
 CREATE TABLE Patient(
 id SERIAL PRIMARY KEY,
 name TEXT,

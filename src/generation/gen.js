@@ -22,7 +22,8 @@ function loadFile() {
 
         console.log(data);
         let tables = getTables(data)
-        generateSQL(tables)
+        generateBackend(tables)
+        generateFrontend(tables)
     } catch (e) {
         console.log(e);
         return
@@ -46,6 +47,11 @@ function getTables(file_data) {
     return tables
 }
 
+function generateBackend(tables) {
+    generateSQL(tables)
+    generateQueries(tables)
+}
+
 function generateTableFieldSQL(field_name, field_value){
     return field_name + " TEXT,\n";
 }
@@ -59,7 +65,7 @@ function generateSQL(tables){
         file_content += "DROP TABLE IF EXISTS " + table.name + ";\n"
     }
 
-    file_content += "--drop\n"
+    file_content += "--tables\n"
     for (let key in tables) {
         let table = tables[key]
         file_content += "CREATE TABLE " + table.name + "(\n"
@@ -102,6 +108,100 @@ function generateSQL(tables){
     })
 
     // return file_content
+}
+
+function generateQueries(tables){
+
+    let file_content = ""
+    let queryFunctionNames = []
+    
+    for (let key in tables) {
+        let table = tables[key]
+        const table_name = table.name
+        file_content += `const ${table_name} = {\n`
+        file_content += getTableListingQuery(table_name, queryFunctionNames)
+        file_content += '}\n'
+        queryFunctionNames.push(table_name)
+    }
+
+    let exports = "" 
+    for (let key in queryFunctionNames)
+        exports += `${queryFunctionNames[key]}, `
+
+    generateQueriesFile(exports, file_content, "src/backend/queries.js")
+}
+
+function getTableListingQuery(table_name, queryFunctionNames){
+
+    // const upper_case_table_name = table_name.charAt(0).toUpperCase() + table_name.slice(1)
+    // queryFunctionNames.push(`get${upper_case_table_name}`) const get${upper_case_table_name}
+    return `list: (request, response) => {
+    pool.query('SELECT * FROM ${table_name} ORDER BY id ASC', (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
+},\n`
+
+}
+
+function getTableElementQuery(table_name) {
+
+}
+
+function createTableElementQuery(table_name) {
+
+}
+
+function deleteTableElementQuery(table_name) {
+
+}
+
+
+function generateFrontend(tables){
+    generateIndex(tables)
+}
+
+function generateIndex(tables){
+    
+    let file_content = "<ul>"
+    for (let key in tables) {
+        let table = tables[key]
+        const table_name = table.name
+        file_content += `<li><a href="/${table_name.toLowerCase()}">${table_name}</a></li>`
+    }
+    file_content += "</ul>"
+    generateHTMLFile("index", file_content, "src/frontend/index.html")
+
+}
+
+function generateHTMLFile(title, content, dest_dir) {
+    let replacementDictionary = {
+        title: title,
+        content: content
+    }
+    generateFileFromTemplate(replacementDictionary, 'src/generation/templates/index.html', dest_dir)
+}
+
+function generateQueriesFile(exports, content, dest_dir) {
+    let replacementDictionary = {
+        exports: exports,
+        content: content
+    }
+    generateFileFromTemplate(replacementDictionary, 'src/generation/templates/queries.txt', dest_dir)
+}
+//#TODO: DICTIONARY WITH REPLACEMENT TAGS AND CONTENT
+function generateFileFromTemplate(replacementDictionary, src_dir, dest_dir){
+    let newFileContent = fs.readFileSync(src_dir).toString()
+    for (let tag in replacementDictionary)
+        newFileContent = newFileContent.replaceAll(`*${tag}`, replacementDictionary[tag])
+    fs.writeFileSync(dest_dir, newFileContent, err => {
+        if (err) {
+            console.error(err)
+            return
+        }
+    })
 }
 
 module.exports = {
