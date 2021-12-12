@@ -24,7 +24,7 @@ app.use(
 
 app.use('/', express.static(__dirname + "/src/frontend"))
 
-app.use('/gen', express.static(__dirname + "/src/frontend"))
+// app.use('/gen', express.static(__dirname + "/src/frontend"))
 
 // app.get('/', db.getTables)
 

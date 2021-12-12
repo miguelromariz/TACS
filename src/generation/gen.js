@@ -47,6 +47,7 @@ function getTables(file_data) {
     return tables
 }
 
+//backend
 function generateBackend(tables) {
     generateSQL(tables)
     generateQueries(tables)
@@ -139,7 +140,10 @@ function getTableListingQuery(table_name){
         if (error) {
             throw error
         }
-        response.status(200).json(results.rows)
+        generateListingPage(results.rows, "${table_name}").then( html => {
+            response.send(html)
+        })
+        // response.status(200).json(results.rows)
     })
 },\n`
 
@@ -153,7 +157,10 @@ function getTableElementQuery(table_name) {
         if (error) {
             throw error
         }
-        response.status(200).json(results.rows)
+        generateTableRowPage(results.rows[0], "${table_name}").then( html => {
+            response.send(html)
+        })
+        // response.status(200).json(results.rows)
     })
 },\n`
 }
@@ -166,7 +173,7 @@ function deleteTableElementQuery(table_name) {
 
 }
 
-
+//frontend
 function generateFrontend(tables){
     generateIndex(tables)
 }
@@ -184,6 +191,8 @@ function generateIndex(tables){
 
 }
 
+
+//file generation
 function generateHTMLFile(title, content, dest_dir) {
     let replacementDictionary = {
         title: title,
@@ -197,7 +206,7 @@ function generateQueriesFile(exports, content, dest_dir) {
         exports: exports,
         content: content
     }
-    generateFileFromTemplate(replacementDictionary, 'src/generation/templates/queries.txt', dest_dir)
+    generateFileFromTemplate(replacementDictionary, 'src/generation/templates/queries.js', dest_dir)
 }
 //#TODO: DICTIONARY WITH REPLACEMENT TAGS AND CONTENT
 function generateFileFromTemplate(replacementDictionary, src_dir, dest_dir){
