@@ -11,11 +11,10 @@ const pool = new Pool({
 
 *content
 
-async function generateListingPage(table, table_name) {
-
+async function generateListingPage(table_rows, table_name, tables_model) {
     let file_content = "<ul>"
-    for (let row in table) {
-        const fields = table[row]
+    for (let row in table_rows) {
+        const fields = table_rows[row]
         const id = fields['id']
         let replacementDictionary = {
             href: `/${table_name.toLowerCase()}/${id}`,
@@ -27,8 +26,13 @@ async function generateListingPage(table, table_name) {
             // < a href = "/${table_name.toLowerCase()}/${id}" > ${ id }</a >
     }
     file_content += "</ul>"
-    console.log(file_content)
-    return generateHTMLFileContent(table_name, file_content, "src/frontend/index.html")
+    form_content = generateCreateFormHTML(table_name, tables_model)
+    let replacementDictionary = {
+        title: table_name + " listing",
+        content: file_content,
+        form: form_content
+    }
+    return generateHTMLFileContent(replacementDictionary, 'tableListing.html')
 }
 
 async function generateTableRowPage(row, table_name) {
@@ -46,21 +50,21 @@ async function generateTableRowPage(row, table_name) {
         file_content += `<li>${tableListingHTMLElem}</li>`
     }
     file_content += "</ul>"
-
-    return generateHTMLFileContent(table_name, file_content, "src/frontend/index.html")
+    let replacementDictionary = {
+        title: table_name,
+        content: file_content
+    }
+    return generateHTMLFileContent(replacementDictionary, "index.html")
 }
 
 //file generation
 async function generateListingHTMLElement(replacementDictionary, template_file) {
-    return generateFileContentFromTemplate(replacementDictionary, 'src/generation/templates/' + template_file)
+    return generateFileContentFromTemplate(replacementDictionary, 'src/generation/templates/elements/' + template_file)
 }
 
-async function generateHTMLFileContent(title, content) {
-    let replacementDictionary = {
-        title: title,
-        content: content
-    }
-    return generateFileContentFromTemplate(replacementDictionary, 'src/generation/templates/index.html')
+async function generateHTMLFileContent(replacementDictionary, page_file) {
+    
+    return generateFileContentFromTemplate(replacementDictionary, 'src/generation/templates/pages/' + page_file)
 }
 
 async function generateFileContentFromTemplate(replacementDictionary, src_dir) {
@@ -68,6 +72,20 @@ async function generateFileContentFromTemplate(replacementDictionary, src_dir) {
     for (let tag in replacementDictionary)
         newFileContent = newFileContent.replaceAll(`*${tag}`, replacementDictionary[tag])
     return newFileContent
+}
+
+function generateCreateFormHTML(table_name, tables_model){
+    
+    const table_model = tables_model.filter(obj => {
+        return obj.name === table_name
+    })[0]
+    let inputsHTML = `<form action="/${table_name}" method="post">`
+    console.log(table_model)
+    for (let field in table_model.fields)
+    {
+        inputsHTML += `<label>${field}<input type="text" id="${field}" name="${field}"></label>`
+    }
+    return inputsHTML + '<input type ="submit" value="Submit"></form>'
 }
 
 module.exports = {

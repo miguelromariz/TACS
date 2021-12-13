@@ -116,12 +116,15 @@ function generateQueries(tables){
     let file_content = ""
     let queryFunctionNames = []
     
+    file_content += "const tables = " + JSON.stringify(tables) + "\n"
+
     for (let key in tables) {
         let table = tables[key]
         const table_name = table.name
         file_content += `const ${table_name} = {\n`
         file_content += getTableListingQuery(table_name)
         file_content += getTableElementQuery(table_name)
+        file_content += createTableElementQuery(tables[key])
         file_content += '}\n'
         queryFunctionNames.push(table_name)
     }
@@ -140,7 +143,7 @@ function getTableListingQuery(table_name){
         if (error) {
             throw error
         }
-        generateListingPage(results.rows, "${table_name}").then( html => {
+        generateListingPage(results.rows, "${table_name}", tables).then( html => {
             response.send(html)
         })
         // response.status(200).json(results.rows)
@@ -165,8 +168,29 @@ function getTableElementQuery(table_name) {
 },\n`
 }
 
-function createTableElementQuery(table_name) {
+function createTableElementQuery(table) {
+    let fields = ""
+    let field_nums = ""
+    let num = 1
+    for (let field_name in table.fields){
+        fields += `${field_name},`
+        field_nums += `\$${num},`
+        num += 1
+    }
+    fields = fields.substring(0, fields.length - 1);
+    field_nums = field_nums.substring(0, field_nums.length - 1);
+    const table_name = table.name
+    return `create: (request, response) => {
+        const { ${fields} } = request.body
 
+        pool.query('INSERT INTO ${table_name} (${fields}) VALUES (${field_nums})', [${fields}], (error, results) => {
+            if (error) {
+                throw error
+            }
+            response.redirect('/${table_name}');
+            // response.status(201).send(\`User added with ID: \${results.id}\`)
+        })
+    },\n`
 }
 
 function deleteTableElementQuery(table_name) {
@@ -198,7 +222,7 @@ function generateHTMLFile(title, content, dest_dir) {
         title: title,
         content: content
     }
-    generateFileFromTemplate(replacementDictionary, 'src/generation/templates/index.html', dest_dir)
+    generateFileFromTemplate(replacementDictionary, 'src/generation/templates/pages/index.html', dest_dir)
 }
 
 function generateQueriesFile(exports, content, dest_dir) {

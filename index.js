@@ -24,23 +24,9 @@ app.use(
 
 app.use('/', express.static(__dirname + "/src/frontend"))
 
-// app.use('/gen', express.static(__dirname + "/src/frontend"))
-
-// app.get('/', db.getTables)
-
-// const generate = (request, response) => {
-//     response.redirect()
-// }
-
 app.get('/', (request, response) => {
-    // response.json({ info: 'Node.js, Express, and Postgres API' })
     response.sendFile("index.html")
 })
-// app.get('/gen', (request, response) => {
-//     // response.json({ info: 'Node.js, Express, and Postgres API' })
-//     response.sendFile("index.html")
-// })
-// app.post('/gen', generate)
 
 // app.get('/users', db.getUsers)
 // app.get('/users/:id', db.getUserById)
@@ -54,7 +40,7 @@ for (let table_name in db){
     const base_dir = `/${table_name}`
     app.get(base_dir, methods["list"])
     app.get(`${base_dir}/:id`, methods["get"])
-    // app.post(base_dir, methods["post"])
+    app.post(base_dir, methods["create"])
     // app.put(`${base_dir}/:id`, methods["put"])
     // app.delete(`${base_dir}/:id`, methods["delete"])
 }
