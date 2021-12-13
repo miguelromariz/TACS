@@ -39,7 +39,7 @@ function getTables(file_data) {
             let fields = file_data[table_name]
             console.log(table_name + "\n->\n" + JSON.stringify(fields))
 
-            tables.push({ name: table_name, fields: fields })
+            tables.push({ name: table_name.toLowerCase(), fields: fields })
         }
 
     }
@@ -125,6 +125,7 @@ function generateQueries(tables){
         file_content += getTableListingQuery(table_name)
         file_content += getTableElementQuery(table_name)
         file_content += createTableElementQuery(tables[key])
+        file_content += deleteTableElementQuery(table_name)
         file_content += '}\n'
         queryFunctionNames.push(table_name)
     }
@@ -194,7 +195,18 @@ function createTableElementQuery(table) {
 }
 
 function deleteTableElementQuery(table_name) {
+    console.log("irmeaum")
+    return `delete: (request, response) => {
+    const id = parseInt(request.params.id)
 
+    pool.query('DELETE FROM ${table_name} WHERE id = $1', [id], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.redirect('/${table_name}');
+        // response.status(200).send(\`User deleted with ID: \${id}\`)
+    })
+},\n`
 }
 
 //frontend
@@ -208,7 +220,7 @@ function generateIndex(tables){
     for (let key in tables) {
         let table = tables[key]
         const table_name = table.name
-        file_content += `<li><a href="/${table_name.toLowerCase()}">${table_name}</a></li>`
+        file_content += `<li><a href="/${table_name}">${table_name}</a></li>`
     }
     file_content += "</ul>"
     generateHTMLFile("index", file_content, "src/frontend/index.html")

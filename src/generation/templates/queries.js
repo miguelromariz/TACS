@@ -17,13 +17,13 @@ async function generateListingPage(table_rows, table_name, tables_model) {
         const fields = table_rows[row]
         const id = fields['id']
         let replacementDictionary = {
-            href: `/${table_name.toLowerCase()}/${id}`,
+            href: `/${table_name}/${id}`,
             text: id
         }
         const tableListingHTMLElem = await generateListingHTMLElement(replacementDictionary, 
             'listingElement.html')
         file_content += `<li>${tableListingHTMLElem}</li>`
-            // < a href = "/${table_name.toLowerCase()}/${id}" > ${ id }</a >
+            // < a href = "/${table_name}/${id}" > ${ id }</a >
     }
     file_content += "</ul>"
     form_content = generateCreateFormHTML(table_name, tables_model)
