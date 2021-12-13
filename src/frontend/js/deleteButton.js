@@ -12,11 +12,11 @@ deleteButtons.forEach((deleteButton) => {
         const url = row_anchor.getAttribute("href") + '/delete'
         function requestListener() {
             if (this.status == 200) {
-               console.log(this.status + ": " + this.responseText);
+            //    console.log(this.status + ": " + this.responseText);
                window.location.reload()
             }
             else{
-                console.log(this.status + ": " + this.responseText);
+                // console.log(this.status + ": " + this.responseText);
                 // window.location.reload()
             }
         }

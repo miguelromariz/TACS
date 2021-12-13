@@ -20,7 +20,7 @@ function loadFile() {
         let fileContents = fs.readFileSync('assets/test.yaml', 'utf8');
         let data = yaml.load(fileContents);
 
-        console.log(data);
+        // console.log(data);
         let tables = getTables(data)
         generateBackend(tables)
         generateFrontend(tables)
@@ -37,7 +37,7 @@ function getTables(file_data) {
     for (let table_name in file_data) {
         if (file_data.hasOwnProperty(table_name)) {
             let fields = file_data[table_name]
-            console.log(table_name + "\n->\n" + JSON.stringify(fields))
+            // console.log(table_name + "\n->\n" + JSON.stringify(fields))
 
             tables.push({ name: table_name.toLowerCase(), fields: fields })
         }
@@ -195,7 +195,6 @@ function createTableElementQuery(table) {
 }
 
 function deleteTableElementQuery(table_name) {
-    console.log("irmeaum")
     return `delete: (request, response) => {
     const id = parseInt(request.params.id)
 

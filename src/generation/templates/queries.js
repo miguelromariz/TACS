@@ -37,7 +37,6 @@ async function generateListingPage(table_rows, table_name, tables_model) {
 
 async function generateTableRowPage(row, table_name) {
 
-    console.log("hey")
     let file_content = "<ul>"
     for (let field in row) {
         const value = row[field]
@@ -80,7 +79,6 @@ function generateCreateFormHTML(table_name, tables_model){
         return obj.name === table_name
     })[0]
     let inputsHTML = `<form action="/${table_name}" method="post">`
-    console.log(table_model)
     for (let field in table_model.fields)
     {
         inputsHTML += `<label>${field}<input type="text" id="${field}" name="${field}"></label>`
