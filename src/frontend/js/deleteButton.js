@@ -9,7 +9,7 @@ deleteButtons.forEach((deleteButton) => {
         event.preventDefault()
 
         const row_anchor = event.target.previousSibling
-        const url = row_anchor.getAttribute("href") 
+        const url = row_anchor.getAttribute("href") + '/delete'
         function requestListener() {
             if (this.status == 200) {
                console.log(this.status + ": " + this.responseText);
@@ -22,7 +22,7 @@ deleteButtons.forEach((deleteButton) => {
         }
         let request = new XMLHttpRequest()
         request.onload = requestListener
-        request.open("DELETE", url, true)
+        request.open("POST", url, true)
         // request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
         request.send()
     })

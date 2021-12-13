@@ -42,7 +42,7 @@ for (let table_name in db){
     app.get(`${base_dir}/:id`, methods["get"])
     app.post(base_dir, methods["create"])
     // app.put(`${base_dir}/:id`, methods["put"])
-    app.delete(`${base_dir}/:id`, methods["delete"])
+    app.post(`${base_dir}/:id/delete`, methods["delete"])
 }
 
 console.log(db)
