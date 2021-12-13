@@ -45,7 +45,6 @@ for (let table_name in db){
     app.post(`${base_dir}/:id/delete`, methods["delete"])
 }
 
-console.log(db)
 
 
 app.listen(port, () => {
