@@ -26,7 +26,7 @@ async function generateListingPage(table_rows, table_name, tables_model) {
             // < a href = "/${table_name}/${id}" > ${ id }</a >
     }
     file_content += "</ul>"
-    form_content = generateCreateFormHTML(table_name, tables_model)
+    form_content = await generateCreateFormHTML(table_name, tables_model)
     let replacementDictionary = {
         title: table_name + " listing",
         content: file_content,
@@ -73,17 +73,42 @@ async function generateFileContentFromTemplate(replacementDictionary, src_dir) {
     return newFileContent
 }
 
-function generateCreateFormHTML(table_name, tables_model){
+async function generateCreateFormHTML(table_name, tables_model){
     
     const table_model = tables_model.filter(obj => {
         return obj.name === table_name
     })[0]
     let inputsHTML = `<form action="/${table_name}" method="post">`
-    for (let field in table_model.fields)
+    for (let field_name in table_model.fields)
     {
-        inputsHTML += `<label>${field}<input type="text" id="${field}" name="${field}"></label>`
+        inputsHTML += await generateCreateInputHTML(field_name, table_model.fields[field_name])
     }
     return inputsHTML + '<input type ="submit" value="Submit"></form>'
+}
+
+async function generateCreateInputHTML(field_name, field_type) {
+
+    let inputHTML = ''
+    switch (field_type) {
+        case "text":
+            inputHTML += `<input type="text" id="${field_name}" name="${field_name}">`
+            break;
+        case "number":
+            inputHTML += `<input type="number" id="${field_name}" name="${field_name}">`
+            break;
+        case "bool":
+            inputHTML += `<input type="hidden" name="${field_name}" value="0"><input type="checkbox" id="${field_name}" name="${field_name}">`
+            break;
+        default:
+            const results = await pool.query(`SELECT id FROM ${field_type} ORDER BY id ASC`)
+            console.log(results.rows)
+            let options = ""
+            for (const row in results.rows)
+                options += `<option value="${results.rows[row]["id"]}">${results.rows[row]["id"]}</option>`
+            inputHTML += `<select id="${field_name}" name="${field_name}">${options}</select>`
+            break;
+    }
+    return `<label>${field_name}${inputHTML}</label>`
 }
 
 module.exports = {

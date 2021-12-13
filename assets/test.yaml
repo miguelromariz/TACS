@@ -9,13 +9,11 @@
 #    - dewey
 #    - louie
 #    - fred
- Patient:
-   name: string
-   age: string
-   doctors:
-     count: 1
-     location: "a pear tree"
-   turtle: two
  Doctor:
-   name: string
+   name: text
    age: number
+ Patient:
+   name: text
+   age: number
+   doctor: doctor
+   turtle: bool

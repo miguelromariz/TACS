@@ -14,7 +14,7 @@ const initDB = (sql) => {
             throw error
         }
         else
-            // console.log(sql)
+            console.log(sql)
     })
 }
 

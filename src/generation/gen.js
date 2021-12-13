@@ -53,30 +53,7 @@ function generateBackend(tables) {
     generateQueries(tables)
 }
 
-function generateTableFieldSQL(field_name, field_value){
-    return field_name + " TEXT,\n";
-}
-
-function generateSQL(tables){
-
-    let file_content = "--drop\n"
-
-    for (let key in tables) {
-        let table = tables[key]
-        file_content += "DROP TABLE IF EXISTS " + table.name + ";\n"
-    }
-
-    file_content += "--tables\n"
-    for (let key in tables) {
-        let table = tables[key]
-        file_content += "CREATE TABLE " + table.name + "(\n"
-        file_content += "id SERIAL PRIMARY KEY,\n";
-        for (let field in table.fields){
-            file_content += generateTableFieldSQL(field, table.fields[field])
-        }
-        file_content = file_content.substring(0, file_content.length - 2);
-        file_content += "\n);\n"
-    }
+function generateTableFieldSQL(field_name, field_type){
     // "
     // --drop
     // DROP TABLE IF EXISTS chat_member;
@@ -100,6 +77,44 @@ function generateSQL(tables){
     //     chat_id INTEGER REFERENCES chat(id) ON UPDATE CASCADE ON DELETE CASCADE,
     //     author TEXT REFERENCES regular(username) ON UPDATE CASCADE ON DELETE CASCADE
     // );"
+    let field_sql = field_name
+    switch(field_type){
+        case "text": 
+            field_sql += " TEXT,\n";
+            break;
+        case "number": 
+            field_sql += " INTEGER,\n";
+            break;
+        case "bool":
+            field_sql += " BOOL,\n";
+            break;
+        default: 
+            field_sql += ` INTEGER REFERENCES ${field_type}(id),\n`;  
+            break;
+    }
+    return field_sql
+}
+
+function generateSQL(tables){
+
+    let file_content = "--drop\n"
+
+    for (let key in tables) {
+        let table = tables[key]
+        file_content += "DROP TABLE IF EXISTS " + table.name + " cascade;\n"
+    }
+
+    file_content += "--tables\n"
+    for (let key in tables) {
+        let table = tables[key]
+        file_content += "CREATE TABLE " + table.name + "(\n"
+        file_content += "id SERIAL PRIMARY KEY,\n";
+        for (let field in table.fields){
+            file_content += generateTableFieldSQL(field, table.fields[field])
+        }
+        file_content = file_content.substring(0, file_content.length - 2);
+        file_content += "\n);\n"
+    }
 
     fs.writeFileSync('src/backend/seed.sql', file_content, err => {
         if (err) {
@@ -183,7 +198,7 @@ function createTableElementQuery(table) {
     const table_name = table.name
     return `create: (request, response) => {
         const { ${fields} } = request.body
-
+        console.log("oi: " + JSON.stringify(request.body))
         pool.query('INSERT INTO ${table_name} (${fields}) VALUES (${field_nums})', [${fields}], (error, results) => {
             if (error) {
                 throw error
