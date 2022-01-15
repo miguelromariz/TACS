@@ -97,7 +97,7 @@ async function generateUpdateFormHTML(table_name, tables_model, row) {
     console.log(table_model)
     for (let field_name in table_model.fields) {
         console.log(row[field_name])
-        inputsHTML += await generateCreateInputHTML(field_name, table_model.fields[field_name], row.field_name)
+        inputsHTML += await generateCreateInputHTML(field_name, table_model.fields[field_name], row[field_name])
     }
     return inputsHTML + '<input type ="submit" value="Submit"></form>'
 }
@@ -112,7 +112,7 @@ function getTableModel(tables_model, table_name) {
 //create input if updateInfo is undefined, update info otherwise
 async function generateCreateInputHTML(field_name, field_type, initialValue) {
 
-    let initialValueAttribute = initialValue ? `value="${initialValue.field_name}"` : ''
+    let initialValueAttribute = initialValue ? `value="${initialValue}"` : ''
     let inputHTML = ''
     switch (field_type) {
         case "text":
@@ -122,7 +122,8 @@ async function generateCreateInputHTML(field_name, field_type, initialValue) {
             inputHTML += `<input type="number" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
             break;
         case "bool":
-            inputHTML += `<input type="hidden" name="${field_name}" ${initialValueAttribute}><input type="checkbox" id="${field_name}" name="${field_name}">`
+            initialValueAttribute = initialValue ? 'checked' : ''
+            inputHTML += `<input type="hidden" name="${field_name}" value=0><input type="checkbox" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
             break;
         default:
             const results = await pool.query(`SELECT id FROM ${field_type} ORDER BY id ASC`)

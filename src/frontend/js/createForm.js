@@ -19,7 +19,9 @@ const form = formDiv.querySelector('form')
 form.addEventListener('submit', (event) => {
     checkboxes.forEach((checkbox) => {
         const hidden_input = checkbox.previousSibling
-        if (checkbox.checked)
-            hidden_input.disabled = true
+        if (checkbox.checked){
+            checkbox.disabled = true
+            hidden_input.value = true
+        }
     })
 })
