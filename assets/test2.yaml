@@ -1,7 +1,8 @@
-Doctor:
-  Name: text
-Patient:
-  Name: doctor
-efwfe:
-  Name: doctor
-  Age: patient
+Manolo:
+  Nome: text
+  Idade: number
+  Morreu: bool
+Jogos:
+  Nome: text
+  Year: number
+  TopPlayer: manolo
