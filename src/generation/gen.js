@@ -32,14 +32,14 @@ function loadFile() {
 
 function getTables(file_data) {
 
-    let tables = []
+    let tables = {}
 
     for (let table_name in file_data) {
         if (file_data.hasOwnProperty(table_name)) {
             let fields = file_data[table_name]
             // console.log(table_name + "\n->\n" + JSON.stringify(fields))
 
-            tables.push({ name: table_name.toLowerCase(), fields: fields })
+            tables[table_name.toLowerCase()] = fields 
         }
 
     }
@@ -99,18 +99,16 @@ function generateSQL(tables){
 
     let file_content = "--drop\n"
 
-    for (let key in tables) {
-        let table = tables[key]
-        file_content += "DROP TABLE IF EXISTS " + table.name + " cascade;\n"
+    for (let table_name in tables) {
+        file_content += "DROP TABLE IF EXISTS " + table_name + " cascade;\n"
     }
 
     file_content += "--tables\n"
-    for (let key in tables) {
-        let table = tables[key]
-        file_content += "CREATE TABLE " + table.name + "(\n"
+    for (let table_name in tables) {
+        file_content += "CREATE TABLE " + table_name + "(\n"
         file_content += "id SERIAL PRIMARY KEY,\n";
-        for (let field in table.fields){
-            file_content += generateTableFieldSQL(field, table.fields[field])
+        for (let field in tables[table_name]){
+            file_content += generateTableFieldSQL(field, tables[table_name][field])
         }
         file_content = file_content.substring(0, file_content.length - 2);
         file_content += "\n);\n"
@@ -133,15 +131,13 @@ function generateQueries(tables){
     
     file_content += "const tables = " + JSON.stringify(tables) + "\n"
 
-    for (let key in tables) {
-        let table = tables[key]
-        const table_name = table.name
+    for (let table_name in tables) {
         file_content += `const ${table_name} = {\n`
         file_content += getTableListingQuery(table_name)
         file_content += getTableElementQuery(table_name)
-        file_content += createTableElementQuery(tables[key])
+        file_content += createTableElementQuery(tables[table_name], table_name)
         file_content += deleteTableElementQuery(table_name)
-        file_content += updateTableElementQuery(tables[key])
+        file_content += updateTableElementQuery(tables[table_name], table_name)
         file_content += '}\n'
         queryFunctionNames.push(table_name)
     }
@@ -185,18 +181,17 @@ function getTableElementQuery(table_name) {
 },\n`
 }
 
-function createTableElementQuery(table) {
+function createTableElementQuery(table, table_name) {
     let fields = ""
     let field_nums = ""
     let num = 1
-    for (let field_name in table.fields){
+    for (let field_name in table){
         fields += `${field_name},`
         field_nums += `\$${num},`
         num += 1
     }
     fields = fields.substring(0, fields.length - 1);
     field_nums = field_nums.substring(0, field_nums.length - 1);
-    const table_name = table.name
     return `create: (request, response) => {
         const { ${fields} } = request.body
         console.log("oi: " + JSON.stringify(request.body))
@@ -224,18 +219,17 @@ function deleteTableElementQuery(table_name) {
 },\n`
 }
 
-function updateTableElementQuery(table) {
+function updateTableElementQuery(table, table_name) {
     let fields = ""
     let setInstruction = "SET "
     let num = 2
-    for (let field_name in table.fields) {
+    for (let field_name in table) {
         fields += `${field_name},`
         setInstruction += `${field_name} = \$${num},`
         num += 1
     }
     fields = fields.substring(0, fields.length - 1);
     setInstruction = setInstruction.substring(0, setInstruction.length - 1);
-    const table_name = table.name
     return `update: (request, response) => {
         const { ${fields} } = request.body
         const id = parseInt(request.params.id)
@@ -258,9 +252,7 @@ function generateFrontend(tables){
 function generateIndex(tables){
     
     let file_content = "<ul>"
-    for (let key in tables) {
-        let table = tables[key]
-        const table_name = table.name
+    for (let table_name in tables) {
         file_content += `<li><a href="/${table_name}">${table_name}</a></li>`
     }
     file_content += "</ul>"

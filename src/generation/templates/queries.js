@@ -80,9 +80,9 @@ async function generateCreateFormHTML(table_name, tables_model){
     
     const table_model = getTableModel(tables_model, table_name)
     let inputsHTML = `<form action="/${table_name}" method="post">`
-    for (let field_name in table_model.fields)
+    for (let field_name in table_model)
     {
-        inputsHTML += await generateCreateInputHTML(field_name, table_model.fields[field_name])
+        inputsHTML += await generateCreateInputHTML(field_name, table_model[field_name])
     }
     return inputsHTML + '<input type ="submit" value="Submit"></form>'
 }
@@ -95,18 +95,16 @@ async function generateUpdateFormHTML(table_name, tables_model, row) {
     console.log("HEY")
     console.log(row)
     console.log(table_model)
-    for (let field_name in table_model.fields) {
+    for (let field_name in table_model) {
         console.log(row[field_name])
-        inputsHTML += await generateCreateInputHTML(field_name, table_model.fields[field_name], row[field_name])
+        inputsHTML += await generateCreateInputHTML(field_name, table_model[field_name], row[field_name])
     }
     return inputsHTML + '<input type ="submit" value="Submit"></form>'
 }
 
 
 function getTableModel(tables_model, table_name) {
-    return tables_model.filter(obj => {
-        return obj.name === table_name
-    })[0]
+    return tables_model[table_name]
 }
 
 //create input if updateInfo is undefined, update info otherwise
