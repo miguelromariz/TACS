@@ -1,2 +1,7 @@
 Doctor:
-  Name: Text
+  Name: text
+Patient:
+  Name: doctor
+efwfe:
+  Name: doctor
+  Age: patient

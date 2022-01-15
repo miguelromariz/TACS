@@ -8,6 +8,7 @@ let createButton = document.getElementById('createButton')
 let form = document.getElementById("form")
 let exists = false
 let submitButton = document.getElementById("addField")
+let tableLabels = []
 
 addTable.addEventListener('click', (event) => {
    /* tableSpace.innerHTML += '<label>Table Name <input type="text" id="tableName" name="TableName"></label>'+
@@ -44,7 +45,6 @@ addTable.addEventListener('click', (event) => {
     let fields = document.getElementById('fields')
     let saveButtonElement = document.getElementById('saveButton')
     let tableLabelElement = document.getElementById('tableLabel')
-    //console.log(countField)
 
     addField.addEventListener('click', (event) => {
         if(event.target && event.target.id == "addField"){
@@ -58,6 +58,9 @@ addTable.addEventListener('click', (event) => {
             inputLabel.innerHTML = fieldName + " Name"
         
             var fieldNameElement = document.createElement("input")
+
+            inputLabel.appendChild(fieldNameElement)
+            newDiv.appendChild(inputLabel)
         
             fieldNameElement.setAttribute("type", "text")
             fieldNameElement.setAttribute("id", fieldNameId)
@@ -66,16 +69,33 @@ addTable.addEventListener('click', (event) => {
             var inputLabel2 = document.createElement("label")
             inputLabel2.innerHTML = fieldName + " Type"
         
-            var fieldType = document.createElement("input")
+            var fieldType = document.createElement("select")
         
-            fieldType.setAttribute("type", "text")
             fieldType.setAttribute("id", fieldTypeId)
             fieldType.setAttribute("name", fieldTypeId)
+
+            var option1 = document.createElement("option")
+            option1.setAttribute("value", "text")
+            option1.innerHTML+= "Text"
+            var option2 = document.createElement("option")
+            option2.setAttribute("value", "number")
+            option2.innerHTML+= "Number"
+            var option3 = document.createElement("option")
+            option3.setAttribute("value", "bool")
+            option3.innerHTML+= "Bool"
+
+            fieldType.appendChild(option1)
+            fieldType.appendChild(option2)
+            fieldType.appendChild(option3)
+
+            tableLabels.forEach((label) => {
+                var extraOption = document.createElement("option")
+                extraOption.setAttribute("value", label.toLowerCase())
+                extraOption.innerHTML += label
+                fieldType.appendChild(extraOption)
+            })
         
-            inputLabel.appendChild(fieldNameElement)
             inputLabel2.appendChild(fieldType)
-        
-            newDiv.appendChild(inputLabel)
             newDiv.appendChild(inputLabel2)
         
             fields.appendChild(newDiv)
@@ -96,7 +116,9 @@ addTable.addEventListener('click', (event) => {
 
         for(let i = 1; i <= countField-1; i++){
             let name = document.getElementById("fieldName" + i)
-            let type = document.getElementById("fieldType" + i)
+            let typeSelected = document.getElementById("fieldType" + i)
+
+            let type = document.createElement("input")
 
             name.toggleAttribute("disabled")
             type.toggleAttribute("disabled")
@@ -104,6 +126,7 @@ addTable.addEventListener('click', (event) => {
             name.setAttribute("name", "table["+numTables+"][fieldName" + i+"]")
             type.setAttribute("id", "table"+numTables+"fieldType" + i)
             type.setAttribute("name", "table["+numTables+"][fieldType" + i+"]")
+            type.value = typeSelected.options[typeSelected.selectedIndex].value
 
             newTable.appendChild(name)
             newTable.appendChild(type)
@@ -117,7 +140,7 @@ addTable.addEventListener('click', (event) => {
         saveButtonElement.remove()
         fields.remove()
         countField = 1
-        console.log("saved")
+        tableLabels.push(tableNameInput.value)
     })
 })
 
