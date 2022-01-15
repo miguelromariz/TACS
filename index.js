@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path');
 const bodyParser = require('body-parser')
 const generation = require('./src/generation/gen')
 const db_init = require('./src/generation/init_db')
@@ -22,17 +23,11 @@ app.use(
     })
 )
 
-app.use('/', express.static(__dirname + "/src/frontend"))
+app.use('/', express.static(path.join(__dirname, "/src/frontend")))
 
 app.get('/', (request, response) => {
     response.sendFile("index.html")
 })
-
-// app.get('/users', db.getUsers)
-// app.get('/users/:id', db.getUserById)
-// app.post('/users', db.createUser)
-// app.put('/users/:id', db.updateUser)
-// app.delete('/users/:id', db.deleteUser)
 
 for (let table_name in db){
 
@@ -41,11 +36,9 @@ for (let table_name in db){
     app.get(base_dir, methods["list"])
     app.get(`${base_dir}/:id`, methods["get"])
     app.post(base_dir, methods["create"])
-    // app.put(`${base_dir}/:id`, methods["put"])
+    app.post(`${base_dir}/:id/update`, methods["update"])
     app.post(`${base_dir}/:id/delete`, methods["delete"])
 }
-
-
 
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)

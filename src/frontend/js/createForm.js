@@ -6,7 +6,10 @@ let formDiv = document.getElementById('form-div')
 if (showFormButton)
     showFormButton.addEventListener('click', (event) => {
         event.preventDefault()
-        formDiv.classList.remove('hidden')
+        if (formDiv.classList.contains('hidden'))
+            formDiv.classList.remove('hidden')
+        else
+            formDiv.classList.add('hidden');
     })
 
 const checkboxes = formDiv.querySelectorAll('input[type="checkbox"]')

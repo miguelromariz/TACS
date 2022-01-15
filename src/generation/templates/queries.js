@@ -26,7 +26,7 @@ async function generateListingPage(table_rows, table_name, tables_model) {
             // < a href = "/${table_name}/${id}" > ${ id }</a >
     }
     file_content += "</ul>"
-    form_content = await generateCreateFormHTML(table_name, tables_model)
+    let form_content = await generateCreateFormHTML(table_name, tables_model)
     let replacementDictionary = {
         title: table_name + " listing",
         content: file_content,
@@ -35,7 +35,7 @@ async function generateListingPage(table_rows, table_name, tables_model) {
     return generateHTMLFileContent(replacementDictionary, 'tableListing.html')
 }
 
-async function generateTableRowPage(row, table_name) {
+async function generateTableRowPage(row, table_name, tables_model) {
 
     let file_content = "<ul>"
     for (let field in row) {
@@ -49,11 +49,13 @@ async function generateTableRowPage(row, table_name) {
         file_content += `<li>${tableListingHTMLElem}</li>`
     }
     file_content += "</ul>"
+    let form_content = await generateUpdateFormHTML(table_name, tables_model, row)
     let replacementDictionary = {
         title: table_name,
-        content: file_content
+        content: file_content,
+        form: form_content
     }
-    return generateHTMLFileContent(replacementDictionary, "index.html")
+    return generateHTMLFileContent(replacementDictionary, "tableRow.html")
 }
 
 //file generation
@@ -73,11 +75,10 @@ async function generateFileContentFromTemplate(replacementDictionary, src_dir) {
     return newFileContent
 }
 
+//create form if updateInfo is undefined, update form otherwise
 async function generateCreateFormHTML(table_name, tables_model){
     
-    const table_model = tables_model.filter(obj => {
-        return obj.name === table_name
-    })[0]
+    const table_model = getTableModel(tables_model, table_name)
     let inputsHTML = `<form action="/${table_name}" method="post">`
     for (let field_name in table_model.fields)
     {
@@ -86,25 +87,50 @@ async function generateCreateFormHTML(table_name, tables_model){
     return inputsHTML + '<input type ="submit" value="Submit"></form>'
 }
 
-async function generateCreateInputHTML(field_name, field_type) {
 
+//create form if updateInfo is undefined, update form otherwise
+async function generateUpdateFormHTML(table_name, tables_model, row) {
+    const table_model = getTableModel(tables_model, table_name)
+    let inputsHTML = `<form action="/${table_name}/${row.id}/update" method="post">`
+    console.log("HEY")
+    console.log(row)
+    console.log(table_model)
+    for (let field_name in table_model.fields) {
+        console.log(row[field_name])
+        inputsHTML += await generateCreateInputHTML(field_name, table_model.fields[field_name], row.field_name)
+    }
+    return inputsHTML + '<input type ="submit" value="Submit"></form>'
+}
+
+
+function getTableModel(tables_model, table_name) {
+    return tables_model.filter(obj => {
+        return obj.name === table_name
+    })[0]
+}
+
+//create input if updateInfo is undefined, update info otherwise
+async function generateCreateInputHTML(field_name, field_type, initialValue) {
+
+    let initialValueAttribute = initialValue ? `value="${initialValue.field_name}"` : ''
     let inputHTML = ''
     switch (field_type) {
         case "text":
-            inputHTML += `<input type="text" id="${field_name}" name="${field_name}">`
+            inputHTML += `<input type="text" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
             break;
         case "number":
-            inputHTML += `<input type="number" id="${field_name}" name="${field_name}">`
+            inputHTML += `<input type="number" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
             break;
         case "bool":
-            inputHTML += `<input type="hidden" name="${field_name}" value="0"><input type="checkbox" id="${field_name}" name="${field_name}">`
+            inputHTML += `<input type="hidden" name="${field_name}" ${initialValueAttribute}><input type="checkbox" id="${field_name}" name="${field_name}">`
             break;
         default:
             const results = await pool.query(`SELECT id FROM ${field_type} ORDER BY id ASC`)
-            console.log(results.rows)
+            // console.log(results.rows)
             let options = ""
-            for (const row in results.rows)
+            for (const row in results.rows){
                 options += `<option value="${results.rows[row]["id"]}">${results.rows[row]["id"]}</option>`
+            }
             inputHTML += `<select id="${field_name}" name="${field_name}">${options}</select>`
             break;
     }

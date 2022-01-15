@@ -14,6 +14,6 @@
    age: number
  Patient:
    name: text
+   familyDoctor: doctor
    age: number
-   doctor: doctor
    turtle: bool

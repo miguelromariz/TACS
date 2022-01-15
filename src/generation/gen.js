@@ -141,6 +141,7 @@ function generateQueries(tables){
         file_content += getTableElementQuery(table_name)
         file_content += createTableElementQuery(tables[key])
         file_content += deleteTableElementQuery(table_name)
+        file_content += updateTableElementQuery(tables[key])
         file_content += '}\n'
         queryFunctionNames.push(table_name)
     }
@@ -176,7 +177,7 @@ function getTableElementQuery(table_name) {
         if (error) {
             throw error
         }
-        generateTableRowPage(results.rows[0], "${table_name}").then( html => {
+        generateTableRowPage(results.rows[0], "${table_name}", tables).then( html => {
             response.send(html)
         })
         // response.status(200).json(results.rows)
@@ -221,6 +222,32 @@ function deleteTableElementQuery(table_name) {
         // response.status(200).send(\`User deleted with ID: \${id}\`)
     })
 },\n`
+}
+
+function updateTableElementQuery(table) {
+    let fields = ""
+    let setInstruction = "SET "
+    let num = 2
+    for (let field_name in table.fields) {
+        fields += `${field_name},`
+        setInstruction += `${field_name} = \$${num},`
+        num += 1
+    }
+    fields = fields.substring(0, fields.length - 1);
+    setInstruction = setInstruction.substring(0, setInstruction.length - 1);
+    const table_name = table.name
+    return `update: (request, response) => {
+        const { ${fields} } = request.body
+        const id = parseInt(request.params.id)
+        console.log("oi: " + JSON.stringify(request.body))
+        pool.query('UPDATE ${table_name} ${setInstruction} WHERE id = $1', [id, ${fields}], (error, results) => {
+            if (error) {
+                throw error
+            }
+            response.redirect(\`/${table_name}/\${id}\`);
+            // response.status(201).send(\`User added with ID: \${results.id}\`)
+        })
+    },\n`
 }
 
 //frontend
