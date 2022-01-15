@@ -51,6 +51,7 @@ async function generateTableRowPage(row, table_name, tables_model) {
         file_content += `<li>${tableListingHTMLElem}</li>`
     }
     file_content += "</ul>"
+    file_content += await generateRelatedTablesHTML(tables_model, table_name, row.id)
     let form_content = await generateUpdateFormHTML(table_name, tables_model, row)
     let replacementDictionary = {
         title: table_name,
@@ -62,8 +63,12 @@ async function generateTableRowPage(row, table_name, tables_model) {
 
 function addAnchorToForeignKeyValue(value, table_name, tables_model, field, id) {
     if (value !== null && value !== undefined && isFieldTypeTable(table_name, tables_model, field))
-        value = `<a href="/${tables_model[table_name][field]}/${value}">${value}</a>`
+        value = getAnchorHTMLFromForeignKey(tables_model[table_name][field], value)
     return value
+}
+
+function getAnchorHTMLFromForeignKey(table_name, id){
+    return `<a href="/${table_name}/${id}">${id}</a>`
 }
 //file generation
 async function generateListingHTMLElement(replacementDictionary, template_file) {
@@ -109,7 +114,6 @@ async function generateUpdateFormHTML(table_name, tables_model, row) {
     return inputsHTML + '<input type ="submit" value="Submit"></form>'
 }
 
-
 function getTableModel(tables_model, table_name) {
     return tables_model[table_name]
 }
@@ -145,6 +149,66 @@ async function generateCreateInputHTML(field_name, field_type, initialValue) {
             break;
     }
     return `<label>${field_name}${inputHTML}</label>`
+}
+
+async function generateRelatedTablesHTML(tables_model, table_name, id) {
+    const relatedTables = getRelatedTables(tables_model, table_name)
+    let final_html = ""
+    for (const curr_table_name in relatedTables) {
+        const related_fields = relatedTables[curr_table_name]
+        let whereCondition = 'WHERE '
+        for (const i in related_fields)
+            whereCondition += `${related_fields[i]} = ${id}${i == related_fields.length - 1 ? '' : ' OR ' }`
+        console.log("Where you at: " + whereCondition)
+        const relatedTablesIds = await pool.query(`SELECT id,${related_fields.join(',')} FROM ${curr_table_name} ${whereCondition} ORDER BY id ASC`)
+        if (relatedTablesIds.rows.length > 0){
+            console.log("Bambribam")
+            console.log(curr_table_name + " has a ref to " + table_name)
+            const table_html = buildRelatedTableHTML(curr_table_name, related_fields, relatedTablesIds.rows)
+            final_html += table_html + "\n"
+        }
+    }
+    return final_html
+}
+
+function buildRelatedTableHTML(curr_table_name, related_fields, relatedInstances){
+    let table_html = ""
+    const buildFieldHtml = (total, instance) => {
+        return total + getAnchorHTMLFromForeignKey(curr_table_name, instance.id) + " "
+    }
+
+    for (const i in related_fields)
+    {
+        const curr_field = related_fields[i]
+        const relevantInstances = relatedInstances.filter((instance) => instance.hasOwnProperty(curr_field))
+        const field_html = relevantInstances.reduce(buildFieldHtml, `${curr_field} (from ${curr_table_name}): `)
+        table_html += field_html;
+    }
+    return table_html
+}
+
+function getRelatedTables(tables_model, table_name) {
+
+    let related_tables = {}
+    for (table_model_name in tables_model) {
+        if (table_name == table_model_name)
+            continue
+        const table_model = tables_model[table_model_name]
+        const related_fields = getRelatedFields(table_model, table_name)
+        if (related_fields.length > 0)
+            related_tables[table_model_name] = related_fields
+    }
+    return related_tables
+}
+
+function getRelatedFields(table_model, table_name) {
+    let related_fields = []
+    for (field_name in table_model) {
+        const field_type = table_model[field_name]
+        if (field_type === table_name)
+            related_fields.push(field_name)
+    }
+    return related_fields
 }
 
 module.exports = {
