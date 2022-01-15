@@ -15,5 +15,6 @@
  Patient:
    name: text
    familyDoctor: doctor
+   babyDoctor: doctor
    age: number
    turtle: bool

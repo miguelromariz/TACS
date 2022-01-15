@@ -104,11 +104,7 @@ async function generateCreateFormHTML(table_name, tables_model){
 async function generateUpdateFormHTML(table_name, tables_model, row) {
     const table_model = getTableModel(tables_model, table_name)
     let inputsHTML = `<form action="/${table_name}/${row['id']}/update" method="post">`
-    console.log("HEY")
-    console.log(row)
-    console.log(table_model)
     for (let field_name in table_model) {
-        console.log(row[field_name])
         inputsHTML += await generateCreateInputHTML(field_name, table_model[field_name], row[field_name])
     }
     return inputsHTML + '<input type ="submit" value="Submit"></form>'
@@ -159,19 +155,16 @@ async function generateRelatedTablesHTML(tables_model, table_name, id) {
         let whereCondition = 'WHERE '
         for (const i in related_fields)
             whereCondition += `${related_fields[i]} = ${id}${i == related_fields.length - 1 ? '' : ' OR ' }`
-        console.log("Where you at: " + whereCondition)
         const relatedTablesIds = await pool.query(`SELECT id,${related_fields.join(',')} FROM ${curr_table_name} ${whereCondition} ORDER BY id ASC`)
         if (relatedTablesIds.rows.length > 0){
-            console.log("Bambribam")
-            console.log(curr_table_name + " has a ref to " + table_name)
-            const table_html = buildRelatedTableHTML(curr_table_name, related_fields, relatedTablesIds.rows)
+            const table_html = buildRelatedTableHTML(curr_table_name, related_fields, relatedTablesIds.rows, id)
             final_html += table_html + "\n"
         }
     }
     return final_html
 }
 
-function buildRelatedTableHTML(curr_table_name, related_fields, relatedInstances){
+function buildRelatedTableHTML(curr_table_name, related_fields, relatedInstances, id){
     let table_html = ""
     const buildFieldHtml = (total, instance) => {
         return total + getAnchorHTMLFromForeignKey(curr_table_name, instance.id) + " "
@@ -180,9 +173,9 @@ function buildRelatedTableHTML(curr_table_name, related_fields, relatedInstances
     for (const i in related_fields)
     {
         const curr_field = related_fields[i]
-        const relevantInstances = relatedInstances.filter((instance) => instance.hasOwnProperty(curr_field))
+        const relevantInstances = relatedInstances.filter((instance) => instance.hasOwnProperty(curr_field) && instance[curr_field] == id)
         const field_html = relevantInstances.reduce(buildFieldHtml, `${curr_field} (from ${curr_table_name}): `)
-        table_html += field_html;
+        table_html += `<div>${field_html}</div>`;
     }
     return table_html
 }
