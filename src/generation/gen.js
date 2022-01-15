@@ -38,12 +38,17 @@ function getTables(file_data) {
         if (file_data.hasOwnProperty(table_name)) {
             let fields = file_data[table_name]
             // console.log(table_name + "\n->\n" + JSON.stringify(fields))
+            for (let name in fields){
+                fields[name.toLowerCase()] = fields[name].toLowerCase()
 
+                if (name !== name.toLowerCase())
+                    delete fields[name]
+            }
             tables[table_name.toLowerCase()] = fields 
         }
 
     }
-
+    // console.log(tables)
     return tables
 }
 

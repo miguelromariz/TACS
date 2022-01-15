@@ -39,7 +39,10 @@ async function generateTableRowPage(row, table_name, tables_model) {
 
     let file_content = "<ul>"
     for (let field in row) {
-        const value = row[field]
+        let value = row[field]
+        if (value !== null && value !== undefined && isFieldTypeTable(table_name, tables_model, field))
+            value = `<a href="/${tables_model[table_name][field]}/${row['id']}">${value}</a>`
+
         let replacementDictionary = {
             field: field,
             value: value
@@ -105,6 +108,10 @@ async function generateUpdateFormHTML(table_name, tables_model, row) {
 
 function getTableModel(tables_model, table_name) {
     return tables_model[table_name]
+}
+
+function isFieldTypeTable(table_name, tables_model, field_name){
+    return field_name !== "id" && tables_model.hasOwnProperty(tables_model[table_name][field_name])
 }
 
 //create input if updateInfo is undefined, update info otherwise
