@@ -40,8 +40,7 @@ async function generateTableRowPage(row, table_name, tables_model) {
     let file_content = "<ul>"
     for (let field in row) {
         let value = row[field]
-        if (value !== null && value !== undefined && isFieldTypeTable(table_name, tables_model, field))
-            value = `<a href="/${tables_model[table_name][field]}/${row['id']}">${value}</a>`
+        value = addAnchorToForeignKeyValue(value, table_name, tables_model, field, row['id'])
 
         let replacementDictionary = {
             field: field,
@@ -61,6 +60,11 @@ async function generateTableRowPage(row, table_name, tables_model) {
     return generateHTMLFileContent(replacementDictionary, "tableRow.html")
 }
 
+function addAnchorToForeignKeyValue(value, table_name, tables_model, field, id) {
+    if (value !== null && value !== undefined && isFieldTypeTable(table_name, tables_model, field))
+        value = `<a href="/${tables_model[table_name][field]}/${value}">${value}</a>`
+    return value
+}
 //file generation
 async function generateListingHTMLElement(replacementDictionary, template_file) {
     return generateFileContentFromTemplate(replacementDictionary, 'src/generation/templates/elements/' + template_file)
@@ -94,7 +98,7 @@ async function generateCreateFormHTML(table_name, tables_model){
 //create form if updateInfo is undefined, update form otherwise
 async function generateUpdateFormHTML(table_name, tables_model, row) {
     const table_model = getTableModel(tables_model, table_name)
-    let inputsHTML = `<form action="/${table_name}/${row.id}/update" method="post">`
+    let inputsHTML = `<form action="/${table_name}/${row['id']}/update" method="post">`
     console.log("HEY")
     console.log(row)
     console.log(table_model)
