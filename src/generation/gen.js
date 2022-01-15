@@ -20,7 +20,7 @@ function loadFile() {
         let fileContents = fs.readFileSync('assets/test.yaml', 'utf8');
         let data = yaml.load(fileContents);
 
-        // console.log(data);
+        console.log(data);
         let tables = getTables(data)
         generateBackend(tables)
         generateFrontend(tables)
@@ -240,6 +240,8 @@ function generateIndex(tables){
     generateHTMLFile("index", file_content, "src/frontend/index.html")
 
 }
+
+
 
 
 //file generation
