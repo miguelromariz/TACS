@@ -62,7 +62,7 @@ function generateTablesYaml(content){
             }
         })
         let yamlstring = yaml.dump(tables)
-        fs.writeFileSync('./assets/test2.yaml', yamlstring, 'utf8')
+        fs.writeFileSync('./assets/model.yaml', yamlstring, 'utf8')
     }
     
 }

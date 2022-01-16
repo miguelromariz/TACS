@@ -17,7 +17,7 @@ let fs = require('fs')
 function loadFile() {
     // console.log(file)
     try {
-        let fileContents = fs.readFileSync('assets/test.yaml', 'utf8');
+        let fileContents = fs.readFileSync('assets/model.yaml', 'utf8');
         let data = yaml.load(fileContents);
 
         console.log(data);
