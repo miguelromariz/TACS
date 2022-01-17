@@ -312,5 +312,5 @@ function generateFileFromTemplate(replacementDictionary, src_dir, dest_dir){
 }
 
 module.exports = {
-    loadFile
+    loadFile, generateTableSQL, generateQueriesCode
 }

@@ -14,7 +14,8 @@ const initDB = async (sql, callback) => {
             throw error
         }
         else
-            callback(1)
+            if (callback)
+                callback(1)
     })
 }
 
