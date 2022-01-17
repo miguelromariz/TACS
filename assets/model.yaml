@@ -1,2 +1,4 @@
-asdasd:
-  'asd3123': text
+Doctor:
+  Name: text
+  Age: number
+  Gender: bool;

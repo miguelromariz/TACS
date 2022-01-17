@@ -15,16 +15,10 @@ function loadFile() {
 
 function generateIndex2(){
     
-    let file_content = '<button type="button" id="addTable">Add Table</button> <div id=createTable> </div>'+
+    let file_content = '<input type="file" id="loadTables" multiple>'+
+                        '<button type="button" id="addTable">Add Table</button> <div id=createTable> </div>'+
                        '<form action="/" method="post" id="form">' +
-                       '<input id="createButton" type ="submit" value="Submit DB"></input></form>'
-
-
-                       /*<label>Table Name <input type="text" id="tableName" name="TableName"></label>
-                       '<button type="button" id="addField">Add Field</button>'+
-                       '<div id="fields"></div>'*/
-                       
-    
+                       '<input id="createButton" type ="submit" value="Submit DB"></input></form>'  
 
     generateHTMLFile("Create Table", file_content, "src/frontend/index.html")
 }
@@ -41,26 +35,51 @@ function generateHTMLFile(title, content, dest_dir) {
 
 function generateTablesYaml(content){
     let tables = {}
+    let data
 
     if(content != {}){
 
-    
-        if(Object.keys(content).length == 1 && content.TableName == ""){
-            console.log("tabela vazia")
-            return
+        try {
+            let fileContents = fs.readFileSync('./assets/model.yaml', 'utf8');
+            data = yaml.load(fileContents);
+        } catch (e) {
+            console.log(e);
         }
+
+        if(data != undefined){
+            Object.keys(data).forEach((key) => {
+                tables[key] = {}
+                Object.keys(data[key]).forEach((key2) => {
+                    tables[key][key2] = data[key][key2].replace(";","")
+                })
+                
+            })
+            content.table.forEach((tabela) => {    
+                let numVar = (Object.keys(tabela).length - 1)/2
+    
+                for(let i = 1; i <= numVar; i++){
+                    let nameString = "fieldName" + i
+                    let typeString = "fieldType" + i
+                    if(i == numVar) tables[tabela.name][tabela[nameString]] = tabela[typeString] + ';'
+                    else tables[tabela.name][tabela[nameString]] = tabela[typeString]
+                }
+            })
+        }else{
+            content.table.forEach((tabela) => {
+                tables[tabela.name] = {}
+    
+                let numVar = (Object.keys(tabela).length - 1)/2
+    
+                for(let i = 1; i <= numVar; i++){
+                    let nameString = "fieldName" + i
+                    let typeString = "fieldType" + i
+                    if(i == numVar) tables[tabela.name][tabela[nameString]] = tabela[typeString] + ';'
+                    else tables[tabela.name][tabela[nameString]] = tabela[typeString]
+                }
+            })
+        }
+
         
-        content.table.forEach((tabela) => {
-            tables[tabela.name] = {}
-
-            let numVar = (Object.keys(tabela).length - 1)/2
-
-            for(let i = 1; i <= numVar; i++){
-                let nameString = "fieldName" + i
-                let typeString = "fieldType" + i
-                tables[tabela.name][tabela[nameString]] = tabela[typeString]
-            }
-        })
         let yamlstring = yaml.dump(tables)
         fs.writeFileSync('./assets/model.yaml', yamlstring, 'utf8')
     }
@@ -79,6 +98,7 @@ function generateFileFromTemplate(replacementDictionary, src_dir, dest_dir){
         }
     })
 }
+
 
 module.exports = {
     loadFile,

@@ -8,13 +8,10 @@ let createButton = document.getElementById('createButton')
 let form = document.getElementById("form")
 let exists = false
 let submitButton = document.getElementById("addField")
+let loadTableButton = document.getElementById("loadTables")
 let tableLabels = []
 
 addTable.addEventListener('click', (event) => {
-   /* tableSpace.innerHTML += '<label>Table Name <input type="text" id="tableName" name="TableName"></label>'+
-                            '<button type="button" id="addField">Add Field</button>'+
-                            '<div id="fields"></div>'*/
-
     var tableLabel = document.createElement("label")
     tableLabel.innerHTML = "Table Name"
     tableLabel.setAttribute("id","tableLabel")
@@ -105,6 +102,14 @@ addTable.addEventListener('click', (event) => {
     })
 
     saveButtonElement.addEventListener("click", (event) => {
+
+        //validate table name
+        if(!/^[a-zA-Z_][a-z0-9_]*/.test(tableNameInput.value)){
+            alert("Nome da tabela errado")
+            return
+        }
+        //
+
         let newTable = document.createElement("div")
         newTable.setAttribute("id", "table"+numTables)
         newTable.setAttribute("name", "table"+numTables)
@@ -118,6 +123,12 @@ addTable.addEventListener('click', (event) => {
             let name = document.getElementById("fieldName" + i)
             let typeSelected = document.getElementById("fieldType" + i)
 
+            //validate fields names
+            if(!/^[a-zA-Z_][a-z0-9_]*/.test(name.value)){
+                alert("Nome de um campo errado")
+                return
+            }
+            //
             let type = document.createElement("input")
 
             name.toggleAttribute("disabled")
@@ -155,14 +166,75 @@ createButton.addEventListener("click", (event) => {
 })
 
 
+loadTableButton.addEventListener("change", async (event) => {
+    const file = event.target.files[0]
+    loadFile(file)
+})
 
+function loadFile(file) {
+    const reader = new FileReader()
+    let content
 
+    reader.addEventListener("load",(event) =>{
+        content = event.target.result
+        loadTables(content)
+    })
 
+    reader.readAsText(file)
+}
 
-
-
-
-
-
-
+function loadTables(content) {
+    let tables= {}
+    console.log(content)
+    let conteudo = content.split(";")
+    conteudo.forEach((table) => {
+        if(table != "\n"){
+            let entries = table.split(":\n")
+            let name = entries[0]
+            name = name.replace(/\s+/g,"")
+            let fields = entries[1]
+            tables[name] = {}
+            fields.split("\n").forEach((entry) => {
+                entry = entry.replace(/\s+/g,"")
+                let data = entry.split(":")
+                let fieldName = data[0]
+                let fieldType = data[1]
+                tables[name][fieldName] = fieldType
+            })
+            
+        }
+    })
     
+    Object.keys(tables).forEach((name) => {
+        tableLabels.push(name)
+        let newTable = document.createElement("div")
+        newTable.setAttribute("id", "table"+numTables)
+        newTable.setAttribute("name", "table"+numTables)
+
+        let tableName = document.createElement("input")
+        tableName.toggleAttribute("disabled")
+        tableName.setAttribute("id", "tableName" + numTables)
+        tableName.setAttribute("name", "tableName" + numTables)
+        tableName.value = name
+        newTable.appendChild(tableName)
+        Object.keys(tables[name]).forEach((fieldName) => {
+            let i = 1
+            let nameInput = document.createElement("input")
+            nameInput.toggleAttribute("disabled")
+            nameInput.setAttribute("id", "table"+numTables+"fieldName" + i)
+            nameInput.setAttribute("name", "table["+numTables+"][fieldName" + i+"]")
+            nameInput.value = fieldName
+            let typeInput = document.createElement("input")           
+            typeInput.toggleAttribute("disabled")
+            typeInput.setAttribute("id", "table"+numTables+"fieldType" + i)
+            typeInput.setAttribute("name", "table["+numTables+"][fieldType" + i+"]")
+            typeInput.value = tables[name][fieldName]
+
+            newTable.appendChild(nameInput)
+            newTable.appendChild(typeInput)
+        })
+        form.insertBefore(newTable, form.firstChild)
+
+        numTables+=1 
+    })
+}
