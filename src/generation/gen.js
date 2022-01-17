@@ -39,12 +39,12 @@ function getTables(file_data) {
             let fields = file_data[table_name]
             // console.log(table_name + "\n->\n" + JSON.stringify(fields))
             for (let name in fields){
-                fields[name.toLowerCase()] = fields[name].toLowerCase()
+                fields[removeFunkyChars(name)] = removeFunkyChars(fields[name])
 
-                if (name !== name.toLowerCase())
+                if (name !== removeFunkyChars(name))
                     delete fields[name]
             }
-            tables[table_name.toLowerCase()] = fields 
+            tables[removeFunkyChars(table_name)] = fields 
         }
 
     }
@@ -52,10 +52,14 @@ function getTables(file_data) {
     return tables
 }
 
+function removeFunkyChars(str){
+    return str.toLowerCase().replace(/([^a-z0-9]+)/gi, '-')
+}
+
 //backend
 function generateBackend(tables) {
     generateSQL(tables)
-    generateQueries(tables)
+    generateQueriesFileCode(tables)
 }
 
 function generateTableFieldSQL(field_name, field_type){
@@ -110,13 +114,7 @@ function generateSQL(tables){
 
     file_content += "--tables\n"
     for (let table_name in tables) {
-        file_content += "CREATE TABLE " + table_name + "(\n"
-        file_content += "id SERIAL PRIMARY KEY,\n";
-        for (let field in tables[table_name]){
-            file_content += generateTableFieldSQL(field, tables[table_name][field])
-        }
-        file_content = file_content.substring(0, file_content.length - 2);
-        file_content += "\n);\n"
+        file_content += generateTableSQL(table_name, tables[table_name]);
     }
 
     fs.writeFileSync('src/backend/seed.sql', file_content, err => {
@@ -129,7 +127,18 @@ function generateSQL(tables){
     // return file_content
 }
 
-function generateQueries(tables){
+function generateTableSQL(table_name, table) {
+    let table_sql = "CREATE TABLE " + table_name + "(\n";
+    table_sql += "id SERIAL PRIMARY KEY,\n";
+    for (let field in table) {
+        table_sql += generateTableFieldSQL(field, table[field]);
+    }
+    table_sql = table_sql.substring(0, table_sql.length - 2);
+    table_sql += "\n);\n";
+    return table_sql;
+}
+
+function generateQueriesFileCode(tables){
 
     let file_content = ""
     let queryFunctionNames = []
@@ -137,13 +146,7 @@ function generateQueries(tables){
     file_content += "const tables = " + JSON.stringify(tables) + "\n"
 
     for (let table_name in tables) {
-        file_content += `const ${table_name} = {\n`
-        file_content += getTableListingQuery(table_name)
-        file_content += getTableElementQuery(table_name)
-        file_content += createTableElementQuery(tables[table_name], table_name)
-        file_content += deleteTableElementQuery(table_name)
-        file_content += updateTableElementQuery(tables[table_name], table_name)
-        file_content += '}\n'
+        file_content += generateQueriesCode(table_name, tables[table_name]);
         queryFunctionNames.push(table_name)
     }
 
@@ -152,6 +155,17 @@ function generateQueries(tables){
         exports += `${queryFunctionNames[key]}, `
 
     generateQueriesFile(exports, file_content, "src/backend/queries.js")
+}
+
+function generateQueriesCode(table_name, table) {
+    let code = `const ${table_name} = {\n`;
+    code += getTableListingQuery(table_name);
+    code += getTableElementQuery(table_name);
+    code += createTableElementQuery(table, table_name);
+    code += deleteTableElementQuery(table_name);
+    code += updateTableElementQuery(table, table_name);
+    code += '}\n';
+    return code;
 }
 
 function getTableListingQuery(table_name){
