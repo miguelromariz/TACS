@@ -185,7 +185,6 @@ function loadFile(file) {
 
 function loadTables(content) {
     let tables= {}
-    console.log(content)
     let conteudo = content.split(";")
     conteudo.forEach((table) => {
         if(table != "\n"){
@@ -214,11 +213,11 @@ function loadTables(content) {
         let tableName = document.createElement("input")
         tableName.toggleAttribute("disabled")
         tableName.setAttribute("id", "tableName" + numTables)
-        tableName.setAttribute("name", "tableName" + numTables)
+        tableName.setAttribute("name", "table["+numTables+"][name]")
         tableName.value = name
         newTable.appendChild(tableName)
+        let i = 1
         Object.keys(tables[name]).forEach((fieldName) => {
-            let i = 1
             let nameInput = document.createElement("input")
             nameInput.toggleAttribute("disabled")
             nameInput.setAttribute("id", "table"+numTables+"fieldName" + i)
@@ -232,6 +231,7 @@ function loadTables(content) {
 
             newTable.appendChild(nameInput)
             newTable.appendChild(typeInput)
+            i += 1
         })
         form.insertBefore(newTable, form.firstChild)
 

@@ -35,50 +35,20 @@ function generateHTMLFile(title, content, dest_dir) {
 
 function generateTablesYaml(content){
     let tables = {}
-    let data
-
     if(content != {}){
 
-        try {
-            let fileContents = fs.readFileSync('./assets/model.yaml', 'utf8');
-            data = yaml.load(fileContents);
-        } catch (e) {
-            console.log(e);
-        }
+        content.table.forEach((tabela) => {
+            tables[tabela.name] = {}
 
-        if(data != undefined){
-            Object.keys(data).forEach((key) => {
-                tables[key] = {}
-                Object.keys(data[key]).forEach((key2) => {
-                    tables[key][key2] = data[key][key2].replace(";","")
-                })
-                
-            })
-            content.table.forEach((tabela) => {    
-                let numVar = (Object.keys(tabela).length - 1)/2
-    
-                for(let i = 1; i <= numVar; i++){
-                    let nameString = "fieldName" + i
-                    let typeString = "fieldType" + i
-                    if(i == numVar) tables[tabela.name][tabela[nameString]] = tabela[typeString] + ';'
-                    else tables[tabela.name][tabela[nameString]] = tabela[typeString]
-                }
-            })
-        }else{
-            content.table.forEach((tabela) => {
-                tables[tabela.name] = {}
-    
-                let numVar = (Object.keys(tabela).length - 1)/2
-    
-                for(let i = 1; i <= numVar; i++){
-                    let nameString = "fieldName" + i
-                    let typeString = "fieldType" + i
-                    if(i == numVar) tables[tabela.name][tabela[nameString]] = tabela[typeString] + ';'
-                    else tables[tabela.name][tabela[nameString]] = tabela[typeString]
-                }
-            })
-        }
+            let numVar = (Object.keys(tabela).length - 1)/2
 
+            for(let i = 1; i <= numVar; i++){
+                let nameString = "fieldName" + i
+                let typeString = "fieldType" + i
+                if(i == numVar) tables[tabela.name][tabela[nameString]] = tabela[typeString] + ';'
+                else tables[tabela.name][tabela[nameString]] = tabela[typeString]
+            }
+        })
         
         let yamlstring = yaml.dump(tables)
         fs.writeFileSync('./assets/model.yaml', yamlstring, 'utf8')

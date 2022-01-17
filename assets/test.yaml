@@ -1,8 +1,8 @@
 Manolo:
   Nome: text
   Idade: number
-  Morreu: bool
+  Morreu: bool;
 Jogos:
   Nome: text
   Year: number
-  TopPlayer: manolo
+  TopPlayer: manolo;

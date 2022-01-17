@@ -1,4 +1,4 @@
 Doctor:
-  Name: text
-  Age: number
-  Gender: bool;
+  Name: text;
+Patient:
+  Age: doctor;
