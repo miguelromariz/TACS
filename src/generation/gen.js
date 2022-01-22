@@ -38,13 +38,13 @@ function getTables(file_data) {
         if (file_data.hasOwnProperty(table_name)) {
             let fields = file_data[table_name]
             // console.log(table_name + "\n->\n" + JSON.stringify(fields))
-            for (let name in fields){
-                fields[name.toLowerCase()] = fields[name].toLowerCase()
+            for (let name in fields) {
+                fields[removeFunkyChars(name)] = removeFunkyChars(fields[name])
 
-                if (name !== name.toLowerCase())
+                if (name !== removeFunkyChars(name))
                     delete fields[name]
             }
-            tables[table_name.toLowerCase()] = fields 
+            tables[removeFunkyChars(table_name)] = fields
         }
 
     }
@@ -52,6 +52,9 @@ function getTables(file_data) {
     return tables
 }
 
+function removeFunkyChars(str) {
+    return str.toLowerCase().replace(/([^a-z0-9]+)/gi, '')
+}
 //backend
 function generateBackend(tables) {
     generateSQL(tables)

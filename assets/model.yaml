@@ -1,4 +1,8 @@
-Doctor:
-  Name: text;
-Patient:
-  Age: doctor;
+Manolo:
+  Nome: text
+  Idade: number
+  Morreu: bool;
+Jogos:
+  Nome: text
+  Year: number
+  TopPlayer: manolo;
