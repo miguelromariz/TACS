@@ -88,16 +88,16 @@ function generateTableFieldSQL(field_name, field_type){
     let field_sql = field_name
     switch(field_type){
         case "text": 
-            field_sql += " TEXT,\n";
+            field_sql += " TEXT NOT NULL,\n";
             break;
         case "number": 
-            field_sql += " INTEGER,\n";
+            field_sql += " INTEGER NOT NULL,\n";
             break;
         case "bool":
-            field_sql += " BOOL,\n";
+            field_sql += " BOOL NOT NULL,\n";
             break;
         default: 
-            field_sql += ` INTEGER REFERENCES ${field_type}(id),\n`;  
+            field_sql += ` INTEGER REFERENCES ${field_type}(id) ON DELETE SET NULL,\n`;  
             break;
     }
     return field_sql
