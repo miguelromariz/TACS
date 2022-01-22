@@ -88,13 +88,13 @@ function generateTableFieldSQL(field_name, field_type){
     let field_sql = field_name
     switch(field_type){
         case "text": 
-            field_sql += " TEXT NOT NULL,\n";
+            field_sql += " TEXT,\n";
             break;
         case "number": 
-            field_sql += " INTEGER NOT NULL,\n";
+            field_sql += " INTEGER,\n";
             break;
         case "bool":
-            field_sql += " BOOL NOT NULL,\n";
+            field_sql += " BOOL,\n";
             break;
         default: 
             field_sql += ` INTEGER REFERENCES ${field_type}(id) ON DELETE SET NULL,\n`;  
@@ -259,12 +259,12 @@ function generateFrontend(tables){
 
 function generateIndex(tables){
     
-    let file_content = "<ul>"
+    let file_content = '<ul class="dbListing">'
     for (let table_name in tables) {
-        file_content += `<li><a href="/${table_name}">${table_name}</a></li>`
+        file_content += `<li class="dbListingElem"><a href="/${table_name}">${table_name}</a></li>`
     }
     file_content += "</ul>"
-    generateHTMLFile("index", file_content, "src/frontend/index.html")
+    generateHTMLFile("Manage Database", file_content, "src/frontend/index.html")
 
 }
 

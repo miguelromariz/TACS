@@ -1,3 +1,174 @@
+
+body {
+    background-color: rgb(111, 168, 168);
+}
+
+.center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    width: 80%;
+}
+
 .hidden {
     visibility: hidden;
+}
+
+.dbListing {
+    /* border: black 1px solid; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    list-style: none;
+    padding: 0px;
+}
+
+.dbListingElem {
+    border: black 3px solid;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 30%;
+    background-color: rgb(232, 236, 238);
+}
+
+.dbListingElem:hover {
+    background-color: rgba(232, 236, 238, 0.76);
+}
+
+.dbListingElem > a{
+    text-decoration: none;
+    color: black;
+    text-transform: capitalize;
+    height: 100%;
+    /* border: black 1px solid; */
+    display: block;
+    padding: 20px;
+    text-align: center;
+}
+
+#title {
+    /* border: black 1px solid; */
+    text-align: center;
+    color: black;
+}
+
+.deleteButton > i {
+    pointer-events: none;
+}
+
+#home, .deleteButton {
+    display: inline-block;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(232, 236, 238);
+}
+
+
+.deleteButton{
+    border-top: black 4px solid;
+    border-right: black 4px solid;
+    width: 5%;
+}
+
+#createButton {
+    width: 5%;
+    align-self: center;
+}
+
+.deleteButton:hover, #createButton:hover {
+    cursor:pointer;
+}
+
+#home {
+    
+    border: black 3px solid;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+
+#home > i, .deleteButton > i{
+    text-align: center;
+}
+#home:hover,  .deleteButton:hover{
+    background-color: rgba(232, 236, 238, 0.76);
+}
+
+/* tableListing */
+
+.tableListing {
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+.tableListingRow{
+    display: flex;
+    flex-direction: row;
+    border-bottom: black 3px solid;
+    border-left: black 3px solid;
+    background-color: black;
+    gap: 3px;
+    margin-top: 0px;
+}
+
+.tableListingRow a{
+    text-decoration: none;
+    color: black;
+}
+
+.tableListingHeader {
+    width: 94.5%;
+    margin-bottom: 0px;
+    background-color: black;
+    border: black 3px solid;
+}
+
+.tableListingElem, .tableListingHeader{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    /* border: black 3px solid; */
+    gap: 3px;
+}
+
+.tableListingElem:hover > .tableListingElemTab{
+    background-color: rgba(232, 236, 238, 0.76);   
+}
+
+.tableListingElem {
+    width: 95%;
+}
+
+.tableListingElemTab, .tableListingHeaderTab{
+    /* border: green 3px solid; */
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space:nowrap;
+    text-align: center;
+    flex: 1 1 0px;
+    text-decoration: none;
+    height: 100%;
+    display: flex;
+    align-items: center; /* Vertical center alignment */
+    justify-content: center; /* Horizontal center alignment */
+}
+
+.tableListingElemTab{
+    background-color: rgb(232, 236, 238);
+}
+
+.tableListingHeaderTab{
+    
+    background-color: rgba(232, 236, 238, 0.582);   
 }

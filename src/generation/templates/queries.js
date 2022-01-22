@@ -12,13 +12,15 @@ const pool = new Pool({
 *content
 
 async function generateListingPage(table_rows, table_name, tables_model) {
-    let file_content = "<ul>"
+    let file_content = table_rows.length > 0 ? generateTableRowHeader(tables_model[table_name]) : ''
+    file_content += '<ul class="tableListing">'
     for (let row in table_rows) {
         const fields = table_rows[row]
         const id = fields['id']
+        
         let replacementDictionary = {
             href: `/${table_name}/${id}`,
-            text: id
+            text: generateTableRowPreview(fields)
         }
         const tableListingHTMLElem = await generateListingHTMLElement(replacementDictionary, 
             'listingElement.html')
@@ -28,11 +30,29 @@ async function generateListingPage(table_rows, table_name, tables_model) {
     file_content += "</ul>"
     let form_content = await generateCreateFormHTML(table_name, tables_model)
     let replacementDictionary = {
-        title: table_name + " listing",
+        title: 'Table: ' + table_name,
         content: file_content,
         form: form_content
     }
     return generateHTMLFileContent(replacementDictionary, 'tableListing.html')
+}
+
+function generateTableRowHeader(table_model) {
+    let header_html = '<div class="tableListingHeader">'
+    header_html += `<div class="tableListingHeaderTab">id</div>`
+    for (const field_name in table_model) {
+        header_html += `<div class="tableListingHeaderTab">${field_name}</div>`
+    }
+    return header_html + "</div>"
+}
+
+function generateTableRowPreview(fields){
+    let preview_html = ""
+    for (const field_name in fields){
+        console.log(field_name + ": " + fields[field_name])
+        preview_html += `<div class="tableListingElemTab">${fields[field_name]}</div>`
+    }
+    return preview_html
 }
 
 async function generateTableRowPage(row, table_name, tables_model) {
@@ -96,7 +116,7 @@ async function generateCreateFormHTML(table_name, tables_model){
     {
         inputsHTML += await generateCreateInputHTML(field_name, table_model[field_name])
     }
-    return inputsHTML + '<input type ="submit" value="Submit"></form>'
+    return inputsHTML + '<input type="submit" value="Submit"></form>'
 }
 
 
@@ -107,7 +127,7 @@ async function generateUpdateFormHTML(table_name, tables_model, row) {
     for (let field_name in table_model) {
         inputsHTML += await generateCreateInputHTML(field_name, table_model[field_name], row[field_name])
     }
-    return inputsHTML + '<input type ="submit" value="Submit"></form>'
+    return inputsHTML + '<input type="submit" value="Submit"></form>'
 }
 
 function getTableModel(tables_model, table_name) {
@@ -125,14 +145,14 @@ async function generateCreateInputHTML(field_name, field_type, initialValue) {
     let inputHTML = ''
     switch (field_type) {
         case "text":
-            inputHTML += `<input type="text" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
+            inputHTML += `<input required type="text" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
             break;
         case "number":
-            inputHTML += `<input type="number" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
+            inputHTML += `<input required type="number" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
             break;
         case "bool":
             initialValueAttribute = initialValue ? 'checked' : ''
-            inputHTML += `<input type="hidden" name="${field_name}" value=0><input type="checkbox" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
+            inputHTML += `<input required type="hidden" name="${field_name}" value=0><input type="checkbox" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
             break;
         default:
             const results = await pool.query(`SELECT id FROM ${field_type} ORDER BY id ASC`)
