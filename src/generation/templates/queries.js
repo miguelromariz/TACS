@@ -57,7 +57,7 @@ function generateTableRowPreview(fields){
 
 async function generateTableRowPage(row, table_name, tables_model) {
 
-    let file_content = "<ul>"
+    let file_content = '<ul class="tableRowListing">' 
     for (let field in row) {
         let value = row[field]
         value = addAnchorToForeignKeyValue(value, table_name, tables_model, field, row['id'])
@@ -74,7 +74,7 @@ async function generateTableRowPage(row, table_name, tables_model) {
     file_content += await generateRelatedTablesHTML(tables_model, table_name, row.id)
     let form_content = await generateUpdateFormHTML(table_name, tables_model, row)
     let replacementDictionary = {
-        title: table_name,
+        title: `Table: <a href="/${table_name}">${table_name}</a>`,
         content: file_content,
         form: form_content
     }
@@ -181,7 +181,7 @@ async function generateRelatedTablesHTML(tables_model, table_name, id) {
             final_html += table_html + "\n"
         }
     }
-    return final_html
+    return `<div>${final_html}</div>`
 }
 
 function buildRelatedTableHTML(curr_table_name, related_fields, relatedInstances, id){

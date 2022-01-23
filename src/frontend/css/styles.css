@@ -1,6 +1,7 @@
 
 body {
     background-color: rgb(111, 168, 168);
+    font-family: 'Roboto', sans-serif;
 }
 
 .center {
@@ -190,4 +191,34 @@ form input[type="submit"] {
 
 input {
     margin-left: 2px;
+}
+
+.tableRowListing {
+    list-style: none;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    width: 50%;
+    align-self: center;
+    background-color: rgb(155, 218, 218);
+    padding: 10px;
+    border: black 3px solid;
+    border-bottom: none;
+    margin-bottom: 0px;
+}
+
+.tableRowListing ~ div {
+    list-style: none;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    width: 50%;
+    align-self: center;
+    background-color: rgb(155, 218, 218);
+    padding: 10px;
+    border: black 3px solid;
+    
+    border-top: none;
 }
