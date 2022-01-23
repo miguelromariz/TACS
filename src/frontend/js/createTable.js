@@ -12,6 +12,9 @@ let loadTableButton = document.getElementById("loadTables")
 let tableLabels = []
 
 addTable.addEventListener('click', (event) => {
+
+
+    addTable.disabled = true
     var tableLabel = document.createElement("label")
     tableLabel.innerHTML = "Table Name"
     tableLabel.setAttribute("id","tableLabel")
@@ -105,7 +108,11 @@ addTable.addEventListener('click', (event) => {
 
         //validate table name
         if(!/^[a-zA-Z_][a-z0-9_]*/.test(tableNameInput.value)){
-            alert("Nome da tabela errado")
+            alert("Table name is invalid")
+            return
+        }
+        if (countField === 1) {
+            alert("Table must have at least one field")
             return
         }
         //
@@ -125,7 +132,7 @@ addTable.addEventListener('click', (event) => {
 
             //validate fields names
             if(!/^[a-zA-Z_][a-z0-9_]*/.test(name.value)){
-                alert("Nome de um campo errado")
+                alert("Field name is invalid")
                 return
             }
             //
@@ -152,6 +159,7 @@ addTable.addEventListener('click', (event) => {
         fields.remove()
         countField = 1
         tableLabels.push(tableNameInput.value)
+        addTable.disabled = false
     })
 })
 
