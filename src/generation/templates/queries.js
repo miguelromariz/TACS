@@ -152,7 +152,7 @@ async function generateCreateInputHTML(field_name, field_type, initialValue) {
             break;
         case "bool":
             initialValueAttribute = initialValue ? 'checked' : ''
-            inputHTML += `<input required type="hidden" name="${field_name}" value=0><input type="checkbox" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
+            inputHTML += `<input type="hidden" name="${field_name}" value=0><input type="checkbox" id="${field_name}" name="${field_name}" ${initialValueAttribute}>`
             break;
         default:
             const results = await pool.query(`SELECT id FROM ${field_type} ORDER BY id ASC`)

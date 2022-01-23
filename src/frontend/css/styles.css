@@ -172,3 +172,22 @@ body {
     
     background-color: rgba(232, 236, 238, 0.582);   
 }
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    border: black 3px solid;
+    background-color: rgb(155, 218, 218);
+    padding: 10px;
+    width: 80%;
+}
+
+form input[type="submit"] {
+    width: 50%;
+    align-self: center;
+}
+
+input {
+    margin-left: 2px;
+}
