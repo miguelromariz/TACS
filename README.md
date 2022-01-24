@@ -32,4 +32,5 @@ Create a database named `crud`:
 ## Running Instructions
 
 To run the database creation app, run `node gen.js`, then open the browser at "http://localhost:3030/"
+
 To run the generated crud application, run `node app.js`, then open the browser at "http://localhost:3000/"
