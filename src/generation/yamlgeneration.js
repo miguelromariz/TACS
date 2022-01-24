@@ -20,7 +20,7 @@ function generateIndex2(){
                        '<form action="/" method="post" id="form">' +
                        '<input id="createButton" type ="submit" value="Submit DB"></input></form>'  
 
-    generateHTMLFile("Create Table", file_content, "src/frontend/index.html")
+    generateHTMLFile("Create Table", file_content, "src/frontend/genYaml.html")
 }
 
 //file generation
@@ -29,7 +29,7 @@ function generateHTMLFile(title, content, dest_dir) {
         title: title,
         content: content
     }
-    generateFileFromTemplate(replacementDictionary, 'src/generation/templates/pages/index.html', dest_dir)
+    generateFileFromTemplate(replacementDictionary, 'src/generation/templates/pages/genYaml.html', dest_dir)
 }
 
 
