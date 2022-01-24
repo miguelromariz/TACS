@@ -3,7 +3,7 @@
 Dynamic CRUD
 ## Report
 
-*[Report](https://www.overleaf.com/read/zhbzcnxjchtw)
+* [Report](https://www.overleaf.com/read/zhbzcnxjchtw)
 
 ## Requirements
 
